@@ -34,7 +34,7 @@ jobs:
           OPENSSL_INCLUDE_DIR: /usr/include/openssl
         run: |
           # Replaced cargo zigbuild with standard cargo build
-          cargo build --release 
+          cargo build --profile max 
 
       - name: Upload binary
         uses: actions/upload-artifact@v4
