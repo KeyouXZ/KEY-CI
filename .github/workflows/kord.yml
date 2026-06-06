@@ -14,31 +14,25 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo apt-get install -y \
-            libssl-dev pkg-config cmake clang nasm golang-go
-
-      - name: Install cargo-zigbuild + zig
-        run: |
-          cargo install cargo-zigbuild
-          pip install ziglang
+          sudo apt-get update
+          sudo apt-get install -y libssl-dev pkg-config cmake clang nasm
 
       - name: Checkout KORD
         uses: actions/checkout@v4
         with:
           repository: KeyouXZ/KORD
-          token: ${{ secrets.GH_TOKEN }} # Ensure this secret is stored in your current repo's secrets
-          path: KORD # This puts the code into a folder named KORD
+          token: ${{ secrets.GH_TOKEN }}
+          path: KORD
 
       - name: Build
         working-directory: KORD
         env:
-          OPENSSL_NO_VENDOR: 0 
-          OPENSSL_STATIC: 1
         run: |
-          cargo zigbuild --profile max --target x86_64-unknown-linux-gnu.2.31
+          # Replaced cargo zigbuild with standard cargo build
+          cargo build --profile max 
 
       - name: Upload binary
         uses: actions/upload-artifact@v4
         with:
-          name: kord-linux-x86_64-glibc2.31
-          path: KORD/target/x86_64-unknown-linux-gnu/max/kord
+          name: kord-linux-binary
+          path: KORD/target/release/kord
