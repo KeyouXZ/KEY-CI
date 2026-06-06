@@ -26,9 +26,15 @@ jobs:
 
       - name: Build
         working-directory: KORD
+        env:
+          # Telling OpenSSL to build statically ensures it doesn't 
+          # rely on specific system versions of libssl at runtime
+          OPENSSL_STATIC: 1
+          OPENSSL_LIB_DIR: /usr/lib/x86_64-linux-gnu
+          OPENSSL_INCLUDE_DIR: /usr/include/openssl
         run: |
           # Replaced cargo zigbuild with standard cargo build
-          cargo build --profile max 
+          cargo build --release 
 
       - name: Upload binary
         uses: actions/upload-artifact@v4
