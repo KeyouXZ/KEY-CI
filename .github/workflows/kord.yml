@@ -27,7 +27,8 @@ jobs:
             nasm \
             rust \
             cargo \
-            git
+            git \
+            rustup
 
           rustup target add x86_64-unknown-linux-musl
 
