@@ -6,7 +6,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    # Menjalankan job di dalam container Alpine
     container:
       image: alpine:latest
       options: --user root
@@ -15,7 +14,6 @@ jobs:
       - name: Install system dependencies
         run: |
           apk update
-          # Menambahkan dependensi yang dibutuhkan untuk kompilasi statik (musl)
           apk add --no-cache \
             build-base \
             openssl-dev \
@@ -25,12 +23,20 @@ jobs:
             cmake \
             clang \
             nasm \
-            rust \
-            cargo \
             git \
-            rustup
+            curl
 
-          rustup target add x86_64-unknown-linux-musl
+      - name: Install Rustup
+        run: |
+          # Instal Rustup resmi
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          # Tambahkan cargo ke PATH sesi ini
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+      - name: Install Target
+        run: |
+          # Gunakan full path karena PATH mungkin belum ter-refresh di langkah yang sama
+          $HOME/.cargo/bin/rustup target add x86_64-unknown-linux-musl
 
       - name: Checkout KORD
         uses: actions/checkout@v4
@@ -42,17 +48,14 @@ jobs:
       - name: Build
         working-directory: KORD
         env:
-          # Menggunakan target musl untuk hasil statik penuh
-          # Alpine menggunakan musl secara default
           OPENSSL_STATIC: 1
-          # Membantu linker mencari library statik di Alpine
+          # Linker musl butuh bantuan untuk menemukan library statik
           LIBRARY_PATH: /usr/lib
         run: |
-          cargo build --profile max --target x86_64-unknown-linux-musl
+          $HOME/.cargo/bin/cargo build --profile max --target x86_64-unknown-linux-musl
 
       - name: Upload binary
         uses: actions/upload-artifact@v4
         with:
           name: kord-linux-binary
-          # Sesuaikan path output sesuai target musl
           path: KORD/target/x86_64-unknown-linux-musl/max/kord
