@@ -23,7 +23,7 @@ jobs:
           pip install ziglang
 
       - name: Clone KORD
-        run: git clone https://oauth2:${{ secrets.GH_TOKEN }}@github.com/KeyouXZ/KORD
+        run: git clone https://${{ secrets.GH_TOKEN }}@github.com/KeyouXZ/KORD
 
       - name: Build
         working-directory: KORD
