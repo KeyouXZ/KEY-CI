@@ -26,7 +26,6 @@ jobs:
 
       - name: Build
         working-directory: KORD
-        env:
         run: |
           # Replaced cargo zigbuild with standard cargo build
           cargo build --profile max 
