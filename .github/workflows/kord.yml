@@ -6,16 +6,28 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    steps:
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: x86_64-unknown-linux-gnu
+    # Menjalankan job di dalam container Alpine
+    container:
+      image: alpine:latest
+      options: --user root
 
-      - name: Install dependencies
+    steps:
+      - name: Install system dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y libssl-dev pkg-config cmake clang nasm
+          apk update
+          # Menambahkan dependensi yang dibutuhkan untuk kompilasi statik (musl)
+          apk add --no-cache \
+            build-base \
+            openssl-dev \
+            openssl-libs-static \
+            opus-dev \
+            pkgconfig \
+            cmake \
+            clang \
+            nasm \
+            rust \
+            cargo \
+            git
 
       - name: Checkout KORD
         uses: actions/checkout@v4
@@ -27,17 +39,17 @@ jobs:
       - name: Build
         working-directory: KORD
         env:
-          # Telling OpenSSL to build statically ensures it doesn't 
-          # rely on specific system versions of libssl at runtime
+          # Menggunakan target musl untuk hasil statik penuh
+          # Alpine menggunakan musl secara default
           OPENSSL_STATIC: 1
-          OPENSSL_LIB_DIR: /usr/lib/x86_64-linux-gnu
-          OPENSSL_INCLUDE_DIR: /usr/include/openssl
+          # Membantu linker mencari library statik di Alpine
+          LIBRARY_PATH: /usr/lib
         run: |
-          # Replaced cargo zigbuild with standard cargo build
-          cargo build --profile max 
+          cargo build --profile max --target x86_64-unknown-linux-musl
 
       - name: Upload binary
         uses: actions/upload-artifact@v4
         with:
           name: kord-linux-binary
-          path: KORD/target/max/kord
+          # Sesuaikan path output sesuai target musl
+          path: KORD/target/x86_64-unknown-linux-musl/max/kord
