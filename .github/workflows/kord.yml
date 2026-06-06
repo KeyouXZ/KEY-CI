@@ -22,8 +22,12 @@ jobs:
           cargo install cargo-zigbuild
           pip install ziglang
 
-      - name: Clone KORD
-        run: git clone https://${{ secrets.GH_TOKEN }}@github.com/KeyouXZ/KORD
+      - name: Checkout KORD
+        uses: actions/checkout@v4
+        with:
+          repository: KeyouXZ/KORD
+          token: ${{ secrets.GH_TOKEN }} # Ensure this secret is stored in your current repo's secrets
+          path: KORD # This puts the code into a folder named KORD
 
       - name: Build
         working-directory: KORD
