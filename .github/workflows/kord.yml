@@ -32,8 +32,8 @@ jobs:
       - name: Build
         working-directory: KORD
         env:
-          OPENSSL_LIB_DIR: /usr/lib/x86_64-linux-gnu
-          OPENSSL_INCLUDE_DIR: /usr/include/openssl
+          OPENSSL_NO_VENDOR: 0 
+          OPENSSL_STATIC: 1
         run: |
           cargo zigbuild --profile max --target x86_64-unknown-linux-gnu.2.31
 
