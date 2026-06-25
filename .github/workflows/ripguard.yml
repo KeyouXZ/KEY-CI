@@ -16,6 +16,12 @@ jobs:
           repository: KeyouXZ/RIPGUARD
           path: RIPGUARD
 
+      - name: Debug checkout
+        run: |
+          pwd
+          ls -lah
+          find . -maxdepth 3 -type f | sort | head -100
+
       - name: Install Zig
         uses: mlugg/setup-zig@v2
         with:
